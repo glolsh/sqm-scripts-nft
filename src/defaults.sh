@@ -100,9 +100,6 @@ else
     OUTPUT_TARGET="/dev/null"
 fi
 
-# .qos script must declare support, or this will be disabled
-[ -z "$SUPPORT_MQ" ] && USE_MQ=0
-
 # Can be overridden by callers that want to silence error output for a
 # particular command
 SILENT=0
