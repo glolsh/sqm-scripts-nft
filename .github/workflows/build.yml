@@ -1,0 +1,48 @@
+name: Build SQM-NFT IPK
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [ "24.10.5", "24.10.6" ]
+        
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          path: 'sqm-src'
+
+      - name: Download OpenWrt SDK ${{ matrix.version }}
+        run: |
+          BASE_URL="https://downloads.openwrt.org/releases/${{ matrix.version }}/targets/rockchip/armv8"
+          SDK_FILE=$(curl -s "$BASE_URL/sha256sums" | grep "openwrt-sdk" | awk '{print $2}' | tr -d '*')
+          
+          echo "Downloading $SDK_FILE..."
+          wget -q "$BASE_URL/$SDK_FILE"
+          tar -xf $SDK_FILE
+          mv openwrt-sdk-* openwrt-sdk
+
+      - name: Prepare Package and Build
+        run: |
+          cd openwrt-sdk
+          ./scripts/feeds update -a
+          
+          mkdir -p package/sqm-scripts-nft
+          cp ../sqm-src/openwrt-pkg/Makefile package/sqm-scripts-nft/Makefile
+          
+          sed -i 's|cp -r ../../../*|cp -r $(TOPDIR)/../sqm-src/*|g' package/sqm-scripts-nft/Makefile
+          
+          make defconfig
+          make package/sqm-scripts-nft/compile V=s
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sqm-nft-${{ matrix.version }}
+          path: openwrt-sdk/bin/packages/*/base/*.ipk
