@@ -34,7 +34,13 @@ either need kernel 4.19 or newer (with matching `iproute2` version), or you need
 to build CAKE yourself from the out-of-tree repository at
 https://github.com/dtaht/sch_cake.
 
-## Installation & Dependencies
+## Hardware
+Optimizations for modern SoCs like NanoPi R6S/R6C (RK3588) for 750Mbps+ speeds.
+
+## Installation
+The package `kmod-ifb` is a mandatory dependency for ingress shaping (Download) to work correctly.
+
+
 `sudo make install` should install things on a regular Linux box. For
 OpenWrt, there are packages available in the distribution, so just install the
 sqm-scripts package, and optionally luci-app-sqm for GUI support.

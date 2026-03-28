@@ -91,7 +91,7 @@ release_lock() {
         return 1
     fi
 
-    rm -rf "$LOCKDIR"
+    rm -f "$LOCKDIR/pid" && rmdir "$LOCKDIR"
     return 0
 }
 
