@@ -270,11 +270,11 @@ create_new_ifb_for_if() {
 }
 
 
-# TODO: report failures
 create_ifb() {
     local name
     local args
     local num_procs
+    local res
     name=$1
     args=
 
@@ -284,6 +284,9 @@ create_ifb() {
         args="numtxqueues $num_procs"
     fi
     $IP link add name $name $args type ifb
+    res=$?
+    [ "$res" -ne "0" ] && sqm_error "Failed to create ifb device $name"
+    return $res
 }
 
 delete_ifb() {
