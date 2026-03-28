@@ -2,8 +2,8 @@
 
 [![DOI](https://zenodo.org/badge/36661217.svg)](https://zenodo.org/badge/latestdoi/36661217)
 
-This repository contains the sqm-scripts traffic shaper from the CeroWrt
-project. See:
+This repository contains a modernized fork of the sqm-scripts traffic shaper from the CeroWrt
+project. This fork is built on pure nftables and is fully compatible with OpenWrt's firewall4. See the original project at:
 http://www.bufferbloat.net/projects/cerowrt/wiki/Smart_Queue_Management
 
 ## How does sqm-scripts set up traffic shaping?
@@ -40,9 +40,15 @@ Optimizations for modern SoCs like NanoPi R6S/R6C (RK3588) for 750Mbps+ speeds.
 ## Installation
 The package `kmod-ifb` is a mandatory dependency for ingress shaping (Download) to work correctly.
 
+
 `sudo make install` should install things on a regular Linux box. For
 OpenWrt, there are packages available in the distribution, so just install the
 sqm-scripts package, and optionally luci-app-sqm for GUI support.
+
+**Note:** `kmod-ifb` is now a mandatory dependency for ingress shaping (Download).
+
+## Performance
+These scripts are optimized for high-speed links (up to 750Mbps and beyond) on modern hardware like the NanoPi R6S/R6C (RK3588).
 
 ## Running on regular Linux distributions
 After installing using `make install`, do the following to enable sqm-scripts:
@@ -118,4 +124,4 @@ SQM_DEBUG controls whether sqm will log the output of the last invocation of sta
 Note: Both the start and stop log are re-written on every sqm instance start and stop and are logging all output independent of the value of `SQM_VERBOSITY_MAX`. They will not grow indefintely, but they are written repeatedly. On reliably rewritable media like hard disk, ssd, flash with wear-leveling, or ram-disk, `SQM_DEBUG` can be safely set to 1 in `defaults.sh`, but on media like NOR flash that do only allow few write-cycles, keeping the default at 0 and using the above invocations to run a single instance with `SQM_DEBUG=1` is recommended.
 
 ---
-*Codebase modernized to pure nftables with AI assistance.*
+*Footnote: The codebase in this repository has been refactored, modernized, and ported to pure nftables with AI assistance. This modernization effort prioritizes transparency, code clarity, performance, and forward compatibility with contemporary Linux networking stacks.*
