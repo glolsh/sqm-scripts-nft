@@ -25,11 +25,6 @@ opkg update
 opkg install sqm-scripts-nft
 ```
 
-Optionally, you can install the LuCI app for GUI support:
-```sh
-opkg install luci-app-sqm
-```
-
 ## Configuration
 
 Configuration is handled via UCI and stored in `/etc/config/sqm`. Below is a brief example of a typical UCI configuration block:
