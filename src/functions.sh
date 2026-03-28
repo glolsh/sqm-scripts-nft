@@ -180,7 +180,7 @@ write_state_file() {
     filename=$1
     shift
     awk "$awkscript" ${SQM_LIB_DIR}/defaults.sh | sort -u | while read var; do
-        val=$(eval echo '$'$var)
+        export "$var"; val=$(awk -v k="$var" 'BEGIN {print ENVIRON[k]}')
         echo "$var=\"$val\""
     done > $filename
 }
@@ -275,6 +275,7 @@ create_ifb() {
     local args
     local num_procs
     local res
+    local err
     name=$1
     args=
 
@@ -283,9 +284,9 @@ create_ifb() {
     if [ "$USE_MQ" -eq "1" ] && [ "$num_procs" -gt 1 ]; then
         args="numtxqueues $num_procs"
     fi
-    $IP link add name $name $args type ifb
+    err=$($IP link add name $name $args type ifb 2>&1)
     res=$?
-    [ "$res" -ne "0" ] && sqm_error "Failed to create ifb device $name"
+    [ "$res" -ne "0" ] && sqm_error "Failed to create ifb device $name: $err"
     return $res
 }
 
@@ -343,13 +344,13 @@ verify_qdisc() {
     fi
     create_ifb $ifb || return 1
 
+    IFB_MTU=$( get_mtu $ifb )
 
     case $qdisc in
         #ingress is special
         ingress) root_string="" ;;
         #cannot instantiate tbf without args
         tbf)
-    	    IFB_MTU=$( get_mtu $ifb )
 	    IFB_MTU=$(( ${IFB_MTU} + 14 )) # TBF's warning is confused, it says MTU but it checks MTU + 14
 	    args="limit 1 burst ${IFB_MTU} rate 1kbps"
 	    ;;
@@ -554,6 +555,7 @@ get_burst() {
     local SHAPER_BURST_US
     local MIN_BURST
     local BURST
+    [ -z "$1" ] && return 0
     MTU=$1
     BANDWIDTH=$2 # note bandwidth is always given in kbps
     SHAPER_BURST_US=$3
@@ -662,6 +664,7 @@ get_flows_count() {
 get_target() {
     local CUR_TARGET
     local CUR_LINK_KBPS
+    [ -z "$1" ] && return 0
     CUR_TARGET=${1}
     CUR_LINK_KBPS=${2}
     [ ! -z "$CUR_TARGET" ] && sqm_debug "cur_target: ${CUR_TARGET} cur_bandwidth: ${CUR_LINK_KBPS}"
@@ -766,9 +769,6 @@ adapt_interval_to_slow_link() {
             echo "interval ${INTERVAL}us"
             ;;
         pie)
-            ## not sure if pie needs this, probably not
-            #TUPDATE=$(( (30 - 20) * 1000 + ${TARGET} ))
-            #echo "tupdate ${TUPDATE}us"
             ;;
     esac
 }

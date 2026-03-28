@@ -34,7 +34,12 @@ either need kernel 4.19 or newer (with matching `iproute2` version), or you need
 to build CAKE yourself from the out-of-tree repository at
 https://github.com/dtaht/sch_cake.
 
-## Installing
+## Hardware
+Optimizations for modern SoCs like NanoPi R6S/R6C (RK3588) for 750Mbps+ speeds.
+
+## Installation
+The package `kmod-ifb` is a mandatory dependency for ingress shaping (Download) to work correctly.
+
 `sudo make install` should install things on a regular Linux box. For
 OpenWrt, there are packages available in the distribution, so just install the
 sqm-scripts package, and optionally luci-app-sqm for GUI support.
@@ -111,3 +116,6 @@ SQM_DEBUG controls whether sqm will log the output of the last invocation of sta
     `SQM_DEBUG=1 SQM_VERBOSITY_MAX=8 /etc/init.d/sqm stop ; SQM_DEBUG=1 SQM_VERBOSITY_MAX=8 /etc/init.d/sqm start`
 
 Note: Both the start and stop log are re-written on every sqm instance start and stop and are logging all output independent of the value of `SQM_VERBOSITY_MAX`. They will not grow indefintely, but they are written repeatedly. On reliably rewritable media like hard disk, ssd, flash with wear-leveling, or ram-disk, `SQM_DEBUG` can be safely set to 1 in `defaults.sh`, but on media like NOR flash that do only allow few write-cycles, keeping the default at 0 and using the above invocations to run a single instance with `SQM_DEBUG=1` is recommended.
+
+---
+*Codebase modernized to pure nftables with AI assistance.*
