@@ -12,7 +12,7 @@ define Package/sqm-scripts-nft
   SECTION:=net
   CATEGORY:=Network
   TITLE:=SQM Scripts (Pure nftables)
-  DEPENDS:=+tc +kmod-sched-cake +nftables
+  DEPENDS:=+tc +kmod-sched-cake +nftables +kmod-ifb
   PKGARCH:=all
 endef
 

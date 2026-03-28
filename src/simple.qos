@@ -49,7 +49,7 @@ nft_setup() {
             ;;
         *)
             # Add chains for classification if not cake
-            NFT_RULES+="
+            NFT_RULES="${NFT_RULES}
         chain qos_mark_${IFACE} {
             meta priority set 1:12
             ip dscp cs1 meta priority set 1:13
@@ -67,13 +67,13 @@ nft_setup() {
     esac
 
     # Prerouting hook
-    NFT_RULES+="
+    NFT_RULES="${NFT_RULES}
         chain prerouting {
             type filter hook prerouting priority ${SQM_NFT_PRIORITY}; policy accept;
 "
     if [ "$ZERO_DSCP_INGRESS" = "1" ]; then
         sqm_debug "Squashing differentiated services code points (DSCP) from ingress."
-        NFT_RULES+="
+        NFT_RULES="${NFT_RULES}
             iifname \"${IFACE}\" ip dscp != cs0 ip dscp set cs0
             iifname \"${IFACE}\" ip6 dscp != cs0 ip6 dscp set cs0
 "
@@ -81,31 +81,31 @@ nft_setup() {
         sqm_debug "Keeping differentiated services code points (DSCP) from ingress."
         case $QDISC in
             cake*) ;;
-            *) NFT_RULES+="            iifname \"${IFACE}\" jump qos_mark_${IFACE}" ;;
+            *) NFT_RULES="${NFT_RULES}            iifname \"${IFACE}\" jump qos_mark_${IFACE}" ;;
         esac
     fi
 
     # TCP tunnels ordering
-    NFT_RULES+="
+    NFT_RULES="${NFT_RULES}
             iifname \"vtun*\" meta l4proto tcp meta priority set 1:12
         }
 "
 
     # Postrouting hook
-    NFT_RULES+="
+    NFT_RULES="${NFT_RULES}
         chain postrouting {
             type filter hook postrouting priority ${SQM_NFT_PRIORITY}; policy accept;
 "
     case $QDISC in
         cake*) ;;
-        *) NFT_RULES+="            oifname \"${IFACE}\" jump qos_mark_${IFACE}" ;;
+        *) NFT_RULES="${NFT_RULES}            oifname \"${IFACE}\" jump qos_mark_${IFACE}" ;;
     esac
-    NFT_RULES+="
+    NFT_RULES="${NFT_RULES}
         }
 "
 
     # Output hook for local optimizations
-    NFT_RULES+="
+    NFT_RULES="${NFT_RULES}
         chain output {
             type filter hook output priority ${SQM_NFT_PRIORITY}; policy accept;
             meta l4proto udp udp dport { 123, 53 } ip dscp set af42
