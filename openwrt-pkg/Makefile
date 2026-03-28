@@ -22,7 +22,9 @@ endef
 
 define Build/Prepare
 	mkdir -p $(PKG_BUILD_DIR)
-	cp -r ../../../* $(PKG_BUILD_DIR)/ 2>/dev/null || true
+	cp -r ./src $(PKG_BUILD_DIR)/
+	cp -r ./platform $(PKG_BUILD_DIR)/
+	cp ./Makefile.main $(PKG_BUILD_DIR)/Makefile
 endef
 
 define Build/Compile
