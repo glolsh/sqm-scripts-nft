@@ -40,5 +40,23 @@ config queue 'eth1'
     option linklayer 'none'
 ```
 
+### Advanced CAKE Configuration
+
+For advanced users, you can pass arbitrary configuration parameters directly to the CAKE qdisc using `ingress_extra` and `egress_extra`. This allows setting options like `memlimit`, `ack-filter`, `rtt`, etc., that are not explicitly managed by the primary SQM options.
+
+```uci
+# Example: Increasing memory limit for high-connection environments (e.g., torrenting) and enabling ACK filtering
+config queue 'eth1'
+    option enabled '1'
+    option interface 'eth1'
+    option download '1000000'
+    option upload '50000'
+    option qdisc 'cake'
+    option script 'piece_of_cake.qos'
+    option linklayer 'none'
+    option ingress_extra 'memlimit 64M ack-filter'
+    option egress_extra 'memlimit 64M ack-filter'
+```
+
 ---
 *Footnote: The codebase in this repository has been refactored, modernized, and ported to pure nftables with AI assistance. This modernization effort prioritizes transparency, code clarity, performance, and forward compatibility with contemporary Linux networking stacks.*

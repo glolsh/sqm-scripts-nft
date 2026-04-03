@@ -66,6 +66,8 @@ start_sqm_section() {
     export TARGET=$(config_get "$section" target)
     export QDISC=$(config_get "$section" qdisc)
     export SCRIPT=$(config_get "$section" script)
+    export INGRESS_EXTRA=$(config_get "$section" ingress_extra)
+    export EGRESS_EXTRA=$(config_get "$section" egress_extra)
     export USE_MQ=$(config_get "$section" use_mq)
 
     # The UCI names for these two variables are confusing and should have been

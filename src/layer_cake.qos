@@ -23,7 +23,7 @@ egress() {
     qdisc=$(select_cake $IFACE)
     SILENT=1 $TC qdisc del dev $IFACE root
     $TC qdisc add dev $IFACE root $( get_stab_string ) $qdisc \
-        bandwidth ${UPLINK}kbit $( get_cake_lla_string ) ${EGRESS_CAKE_OPTS} ${EQDISC_OPTS}
+        bandwidth ${UPLINK}kbit $( get_cake_lla_string ) ${EGRESS_CAKE_OPTS} ${EQDISC_OPTS} ${EGRESS_EXTRA}
 
 }
 
@@ -41,7 +41,7 @@ ingress() {
     [ "$ZERO_DSCP_INGRESS" -eq "1" ] && INGRESS_CAKE_OPTS="$INGRESS_CAKE_OPTS wash"
 
     $TC qdisc add dev $DEV root $( get_stab_string ) $qdisc \
-        bandwidth ${DOWNLINK}kbit $( get_cake_lla_string ) ${INGRESS_CAKE_OPTS} ${IQDISC_OPTS}
+        bandwidth ${DOWNLINK}kbit $( get_cake_lla_string ) ${INGRESS_CAKE_OPTS} ${IQDISC_OPTS} ${INGRESS_EXTRA}
 
     $IP link set dev $DEV up
 

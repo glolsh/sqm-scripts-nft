@@ -27,6 +27,9 @@
 [ -z "$IQDISC_OPTS" ] && IQDISC_OPTS=""
 [ -z "$EQDISC_OPTS" ] && EQDISC_OPTS=""
 
+[ -z "$INGRESS_EXTRA" ] && INGRESS_EXTRA=""
+[ -z "$EGRESS_EXTRA" ] && EGRESS_EXTRA=""
+
 # handling of specific important binaries
 [ -z "$TC" ] && TC=tc_wrapper
 [ -z "$TC_BINARY" ] && TC_BINARY=$(command -v tc)
