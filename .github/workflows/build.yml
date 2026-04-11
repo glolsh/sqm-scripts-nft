@@ -2,9 +2,8 @@ name: Build SQM-NFT (Dual Format)
 
 on:
   push:
-    # Теперь сборка запускается только при пуше в основные ветки
     branches: [ "main", "master" ]
-  workflow_dispatch: # Оставляем кнопку для ручного запуска
+  workflow_dispatch:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -13,7 +12,7 @@ jobs:
   build:
     name: Build for OpenWrt ${{ matrix.owrt_ver }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -34,13 +33,12 @@ jobs:
 
       - name: Patch Makefile version
         run: |
-          # Автоматически подставляем номер запуска GitHub в версию пакета
           sed -i "s/^PKG_RELEASE:=.*/PKG_RELEASE:=${{ github.run_number }}/" sqm-src/openwrt-pkg/Makefile
 
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y zstd build-essential libncurses5-dev gawk git gettext libssl-dev xsltproc wget
+          sudo apt-get install -y zstd build-essential libncurses5-dev gawk git gettext libssl-dev xsltproc wget python3-pyelftools python3-setuptools python3-dev
 
       - name: Download and Unpack SDK
         run: |
@@ -52,22 +50,22 @@ jobs:
         run: |
           cd openwrt-sdk
           
-          # Обновляем и устанавливаем фиды (необходимо для зависимостей)
+          # Скачиваем списки пакетов и линкуем их (с новыми python-зависимостями ошибка prereq уйдет)
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           
-          # Копируем исходники проекта в дерево SDK
+          # Копируем структуру твоего проекта
           mkdir -p package/sqm-scripts-nft
           cp ../sqm-src/openwrt-pkg/Makefile package/sqm-scripts-nft/Makefile
           cp -r ../sqm-src/src package/sqm-scripts-nft/
           cp -r ../sqm-src/platform package/sqm-scripts-nft/
           cp ../sqm-src/Makefile package/sqm-scripts-nft/Makefile.main
           
-          # Генерируем конфиг и собираем только наш пакет
+          # Подготавливаем конфиг и собираем конкретно твой пакет
           make defconfig
-          make package/sqm-scripts-nft/compile V=s
+          make package/sqm-scripts-nft/compile V=s -j$(nproc)
 
-          # Ищем результат сборки (.ipk или .apk)
+          # Ищем собранный файл
           FILE_PATH=$(find bin/packages/ -name "sqm-scripts-nft*.${{ matrix.pkg_ext }}" | head -n 1)
           
           if [ -z "$FILE_PATH" ]; then
